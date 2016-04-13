@@ -24,17 +24,16 @@ def remotecat(configfile):
     return run('cat %s' % configfile)
 
 def purgeip(configfile):
-    ''' elimina l'indirizzo IP del server dal file di configurazione'''
+    ''' elimina gli indirizzi IP del server dal file di configurazione'''
     own_ip_regexp = re.compile(r'listen\s+(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})', flags=re.IGNORECASE)
-    try:
-        own_ip = own_ip_regexp.search(configfile).group(1)
-        return configfile.replace(own_ip, '')
-    except AttributeError:
-        return configfile
+    own_ip_list = own_ip_regexp.findall(configfile)
+    for ip in own_ip_list:
+        configfile = configfile.replace(ip, '')
+    return configfile
 
 if __name__ == '__main__':
     files_list = []
     for configfile in args.configfiles.split(','):
         with hide('everything'):
             files_list.append(execute(remotecat, configfile))
-    print purgeip((files_list[1]['RT-GIUSTIZIA-FE01-P1.rt.tix.it']))
+    print purgeip((files_list[0]['RT-GIUSTIZIA-FE01-P1.rt.tix.it']))
