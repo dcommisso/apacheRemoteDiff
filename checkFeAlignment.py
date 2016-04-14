@@ -7,12 +7,14 @@ import argparse
 import re
 import difflib
 
-parser = argparse.ArgumentParser(description='tool per controllare se i file di configurazione di due Apache in cluster sono allineati')
+descrizione = "Tool per diff tra file su server remoti. E' ottimizzato per Apache: ignora le linee vuote, l'identazione, i commenti, le tabulazioni, gli spazi multipli, gli spazi alla fine della riga e le occorrenze degli indirizzi IP del server. I file confrontati, se non esplicitamente specificato, sono: /etc/httpd/conf/httpd.conf, etc/httpd/conf.d/ssl.conf, /etc/httpd/conf.d/workers.properties"
+
+parser = argparse.ArgumentParser(description=descrizione)
 parser.add_argument('hosts', help='lista dei nodi apache separati da virgola', metavar='host1,host2')
 parser.add_argument('-u', default='root', metavar='username', help="username per connettersi alle macchine remote")
-parser.add_argument('-p', metavar = 'password', help="password per connettersi alle macchine remote")
+parser.add_argument('-p', metavar='password', help="password per connettersi alle macchine remote")
 parser.add_argument('--configfiles', default='/etc/httpd/conf/httpd.conf,/etc/httpd/conf.d/ssl.conf,/etc/httpd/conf.d/workers.properties',\
-                    help='lista file da confrontare separati da virgola')
+                    help='lista file da confrontare separati da virgola', metavar='file1,file2,file3,...')
 args = parser.parse_args()
 
 env.hosts = args.hosts.split(',')
