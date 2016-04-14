@@ -47,14 +47,14 @@ def purgejunk(configfile):
         retfile += line.rstrip() + '\n'
     return retfile
 
-def compare(a, b):
+def compare(a, b, fromfile, tofile):
     '''confronta due stringhe in input facendo preventivamente purge e restituisce le eventuali differenze'''
     a = purgeip(a)
     a = purgejunk(a)
     b = purgeip(b)
     b = purgejunk(b)
 
-    diff_result = difflib.unified_diff(a.split('\n'),b.split('\n'))
+    diff_result = difflib.unified_diff(a.split('\n'),b.split('\n'), fromfile=fromfile, tofile=tofile)
     return '\n'.join(diff_result)
     
 if __name__ == '__main__':
@@ -62,10 +62,9 @@ if __name__ == '__main__':
     for configfile in args.configfiles.split(','):
         with hide('everything'):
             remote_files_dict = execute(remotecat, configfile)
+            machine1, machine2 = remote_files_dict.keys()
             a, b = remote_files_dict.values()
-            differences = compare(a, b)
-            if differences:
-                report += configfile + '\n'
-                report += differences
+            differences = compare(a, b, configfile + ' - ' + machine1, configfile + ' - ' + machine2)
+            report += differences
     print(report)
 
