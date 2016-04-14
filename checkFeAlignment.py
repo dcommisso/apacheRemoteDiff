@@ -5,6 +5,7 @@ from fabric.tasks import execute
 from fabric.context_managers import hide
 import argparse
 import re
+import difflib
 
 parser = argparse.ArgumentParser(description='tool per controllare se i file di configurazione di due Apache in cluster sono allineati')
 parser.add_argument('hosts', help='lista dei nodi apache separati da virgola', metavar='host1,host2')
@@ -31,9 +32,19 @@ def purgeip(configfile):
         configfile = configfile.replace(ip, '')
     return configfile
 
+def purgejunk(configfile):
+    ''' elimina linee vuote, identazione e commenti'''
+    blank_line = re.compile(r'^\s+', flags = re.MULTILINE)
+    comments = re.compile(r'^\s*#.*', flags = re.MULTILINE)
+    configfile = comments.sub('', configfile)
+    configfile = blank_line.sub('', configfile)
+    return configfile
+
 if __name__ == '__main__':
     files_list = []
     for configfile in args.configfiles.split(','):
         with hide('everything'):
             files_list.append(execute(remotecat, configfile))
-    print purgeip((files_list[0]['RT-GIUSTIZIA-FE01-P1.rt.tix.it']))
+    a = files_list[0]['RT-GIUSTIZIA-FE01-P1.rt.tix.it']
+    b = files_list[0]['RT-GIUSTIZIA-FE01-P2.rt.tix.it']
+    purgejunk(a)
