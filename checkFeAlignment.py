@@ -33,7 +33,7 @@ def purgeip(configfile):
     return configfile
 
 def purgejunk(configfile):
-    ''' elimina linee vuote, identazione, commenti, tabulazioni, spazi multipli'''
+    ''' elimina linee vuote, identazione, commenti, tabulazioni, spazi multipli e spazi alla fine'''
     blank_line_rule = re.compile(r'^\s+', flags = re.MULTILINE)
     comments_rule = re.compile(r'^\s*#.*', flags = re.MULTILINE)
     tabs_rule = re.compile(r'\t+')
@@ -42,15 +42,18 @@ def purgejunk(configfile):
     configfile = blank_line_rule.sub('', configfile)
     configfile = tabs_rule.sub(' ', configfile)
     configfile = spaces_rule.sub(' ', configfile)
-    return configfile
+    retfile = ''
+    for line in configfile.split('\n'):
+        retfile += line.rstrip() + '\n'
+    return retfile
 
 if __name__ == '__main__':
     files_list = []
     for configfile in args.configfiles.split(','):
         with hide('everything'):
             files_list.append(execute(remotecat, configfile))
-    a = files_list[0]['RT-GIUSTIZIA-FE01-P1.rt.tix.it']
-    b = files_list[0]['RT-GIUSTIZIA-FE01-P2.rt.tix.it']
+    a = files_list[1]['RT-GIUSTIZIA-FE01-P1.rt.tix.it']
+    b = files_list[1]['RT-GIUSTIZIA-FE01-P2.rt.tix.it']
     a = purgeip(a)
     a = purgejunk(a)
     b = purgeip(b)
