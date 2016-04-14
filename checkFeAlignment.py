@@ -58,15 +58,14 @@ def compare(a, b):
     return '\n'.join(diff_result)
     
 if __name__ == '__main__':
-    files_list = []
+    report = ''
     for configfile in args.configfiles.split(','):
         with hide('everything'):
-            files_list.append(execute(remotecat, configfile))
-    a = files_list[1]['RT-GIUSTIZIA-FE01-P1.rt.tix.it']
-    b = files_list[1]['RT-GIUSTIZIA-FE01-P2.rt.tix.it']
-    print(compare(a,b))
-    
-
-
-    #print(b)
+            remote_files_dict = execute(remotecat, configfile)
+            a, b = remote_files_dict.values()
+            differences = compare(a, b)
+            if differences:
+                report += configfile + '\n'
+                report += differences
+    print(report)
 
