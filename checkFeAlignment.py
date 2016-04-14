@@ -47,6 +47,16 @@ def purgejunk(configfile):
         retfile += line.rstrip() + '\n'
     return retfile
 
+def compare(a, b):
+    '''confronta due stringhe in input facendo preventivamente purge e restituisce le eventuali differenze'''
+    a = purgeip(a)
+    a = purgejunk(a)
+    b = purgeip(b)
+    b = purgejunk(b)
+
+    diff_result = difflib.unified_diff(a.split('\n'),b.split('\n'))
+    return '\n'.join(diff_result)
+    
 if __name__ == '__main__':
     files_list = []
     for configfile in args.configfiles.split(','):
@@ -54,16 +64,9 @@ if __name__ == '__main__':
             files_list.append(execute(remotecat, configfile))
     a = files_list[1]['RT-GIUSTIZIA-FE01-P1.rt.tix.it']
     b = files_list[1]['RT-GIUSTIZIA-FE01-P2.rt.tix.it']
-    a = purgeip(a)
-    a = purgejunk(a)
-    b = purgeip(b)
-    b = purgejunk(b)
-
-
+    print(compare(a,b))
     
-    result = difflib.unified_diff(a.split('\n'),b.split('\n'))
-    for line in result:
-        print line
+
 
     #print(b)
 
