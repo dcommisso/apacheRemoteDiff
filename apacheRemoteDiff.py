@@ -15,6 +15,7 @@ parser.add_argument('-u', default='root', metavar='username', help="username per
 parser.add_argument('-p', metavar='password', help="password per connettersi alle macchine remote")
 parser.add_argument('--configfiles', default='/etc/httpd/conf/httpd.conf,/etc/httpd/conf.d/ssl.conf,/etc/httpd/conf.d/workers.properties',\
                     help='lista file da confrontare separati da virgola', metavar='file1,file2,file3,...')
+parser.add_argument('--reportok', action='store_true', help='restituisce "OK" se non ci sono differenze, invece di nessun output')
 args = parser.parse_args()
 
 env.hosts = args.hosts.split(',')
@@ -79,6 +80,10 @@ if __name__ == '__main__':
         with hide('everything'):
             remote_files_dict = execute(remotecat, configfile)
             differences = compare_strings_in_dict(remote_files_dict, configfile)
-            report += differences
-    print(report)
+            if differences:
+                report += differences
+    if not report and args.reportok:
+        print('OK')
+    else:
+        print(report)
 
