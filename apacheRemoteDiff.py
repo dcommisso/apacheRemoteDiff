@@ -34,6 +34,12 @@ def purgeip(configfile):
         configfile = configfile.replace(ip, '')
     return configfile
 
+def purgehostname(configfile, hostname):
+    ''' ricava l'hostname senza dominio e toglie tutte le occorrenze nella stringa in input '''
+    hostname_rule = re.compile(r'(\w+)\..*')
+    hostname_no_domain = hostname_rule.sub(r'\1', hostname)
+    return re.sub(hostname_no_domain, '', configfile, flags = re.IGNORECASE)
+
 def purgejunk(configfile):
     ''' elimina linee vuote, identazione, commenti, tabulazioni, spazi multipli e spazi alla fine'''
     blank_line_rule = re.compile(r'^\s+', flags = re.MULTILINE)
@@ -55,9 +61,13 @@ def compare_strings_in_dict(remote_files_dict, configFileName):
     a, b = remote_files_dict.values()
     first_file_desc = configFileName + ' - ' + hostname1
     second_file_desc = configFileName + ' - ' + hostname2
+
     a = purgeip(a)
+    a = purgehostname(a, hostname1)
     a = purgejunk(a)
+
     b = purgeip(b)
+    b = purgehostname(b, hostname2)
     b = purgejunk(b)
 
     diff_result = difflib.unified_diff(a.split('\n'),b.split('\n'), fromfile=first_file_desc, tofile=second_file_desc)
