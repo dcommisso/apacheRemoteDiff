@@ -49,14 +49,18 @@ def purgejunk(configfile):
         retfile += line.rstrip() + '\n'
     return retfile
 
-def compare(a, b, fromfile, tofile):
-    '''confronta due stringhe in input facendo preventivamente purge e restituisce le eventuali differenze'''
+def compare_strings_in_dict(remote_files_dict, configFileName):
+    '''confronta due stringhe in un dizionario restituito da fabric execute in input, facendo preventivamente purge e restituisce le eventuali differenze'''
+    hostname1, hostname2 = remote_files_dict.keys()
+    a, b = remote_files_dict.values()
+    first_file_desc = configFileName + ' - ' + hostname1
+    second_file_desc = configFileName + ' - ' + hostname2
     a = purgeip(a)
     a = purgejunk(a)
     b = purgeip(b)
     b = purgejunk(b)
 
-    diff_result = difflib.unified_diff(a.split('\n'),b.split('\n'), fromfile=fromfile, tofile=tofile)
+    diff_result = difflib.unified_diff(a.split('\n'),b.split('\n'), fromfile=first_file_desc, tofile=second_file_desc)
     return '\n'.join(diff_result)
     
 if __name__ == '__main__':
@@ -64,9 +68,7 @@ if __name__ == '__main__':
     for configfile in args.configfiles.split(','):
         with hide('everything'):
             remote_files_dict = execute(remotecat, configfile)
-            machine1, machine2 = remote_files_dict.keys()
-            a, b = remote_files_dict.values()
-            differences = compare(a, b, configfile + ' - ' + machine1, configfile + ' - ' + machine2)
+            differences = compare_strings_in_dict(remote_files_dict, configfile)
             report += differences
     print(report)
 
