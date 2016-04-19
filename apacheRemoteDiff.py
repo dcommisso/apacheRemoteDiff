@@ -63,13 +63,13 @@ def compare_strings_in_dict(remote_files_dict, configFileName):
     first_file_desc = configFileName + ' - ' + hostname1
     second_file_desc = configFileName + ' - ' + hostname2
 
+    a = purgejunk(a)
     a = purgeip(a)
     a = purgehostname(a, hostname1)
-    a = purgejunk(a)
 
+    b = purgejunk(b)
     b = purgeip(b)
     b = purgehostname(b, hostname2)
-    b = purgejunk(b)
 
     diff_result = difflib.unified_diff(a.split('\n'),b.split('\n'), fromfile=first_file_desc, tofile=second_file_desc)
     return '\n'.join(diff_result)
