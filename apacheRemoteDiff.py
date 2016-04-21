@@ -16,6 +16,7 @@ parser.add_argument('-p', metavar='password', help="password per connettersi all
 parser.add_argument('--configfiles', default='/etc/httpd/conf/httpd.conf,/etc/httpd/conf.d/ssl.conf,/etc/httpd/conf.d/workers.properties',\
                     help='lista file da confrontare separati da virgola', metavar='file1,file2,file3,...')
 parser.add_argument('--reportok', action='store_true', help='restituisce "OK" se non ci sono differenze, invece di nessun output')
+parser.add_argument('-q', action='store_true', help='Quiet mode. Restituisce solo la lista dei file che differiscono.')
 args = parser.parse_args()
 
 env.hosts = args.hosts.split(',')
@@ -71,7 +72,11 @@ def compare_strings_in_dict(remote_files_dict, configFileName):
     b = purgeip(b)
     b = purgehostname(b, hostname2)
 
-    diff_result = difflib.unified_diff(a.split('\n'),b.split('\n'), fromfile=first_file_desc, tofile=second_file_desc)
+    diff_result = list(difflib.unified_diff(a.split('\n'),b.split('\n'), fromfile=first_file_desc, tofile=second_file_desc))
+
+    if diff_result and args.q:
+        return configFileName + '\n'
+    
     return '\n'.join(diff_result)
     
 if __name__ == '__main__':
